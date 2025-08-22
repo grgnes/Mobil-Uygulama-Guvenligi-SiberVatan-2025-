@@ -1,5 +1,3 @@
-# 2025 SİBERVATAN MOBİL UYGULAMA GÜVENLİĞİ NOTLARI
-
 Eğitim sürecinde kullandığımız tüm lablar ve eğitim içeriği bu repository de toplanmıştır. 
 
 ## Frida API
@@ -13,7 +11,7 @@ Not: Cihazda python kurulu olmalı
 ```
 
 ```powershell
-> pip3 install frida-tools 16.2.1
+> pip3 install frida-tools 12.1.1
 ```
 
 ### Android cihaz için kurulum :
@@ -105,7 +103,11 @@ Uygulamaya PID ile bağlanır.
 
 Paketin pid i bulunur.
 
-### Frida'nın Farklı Kullanım ve Analiz Yöntemleri
+- ps | grep frida-server,  `netstat -tulpn | grep 27042` ,  pkill frida
+
+Pid numarasını verir.
+
+### Frida'nın Kullanım ve Analiz Yöntemleri
 
 ### **1. ptrace()**
 
@@ -123,13 +125,45 @@ Paketin pid i bulunur.
 ### **3.** Frida Trace
 
 - Frida'nın API çağrılarını dinlemek için kullandığı bir araçtır.
-- Örneğin, bir Android uygulamasında `open()`, `read()`, `write()`, `send()`, `recv()` gibi fonksiyonları izlemek için kullanılır.
+- Class/metodları **runtime’da izler**, çağrıldığında loglar, ve handler dosyaları oluşturur.
 - Şu şekilde başlatılır:
     
     ```powershell
-    frida -U -n com.example.app -i open
+    frida-trace -U -j "com.byterialab.challenge0x1.MainActivity!*" Challenge0x1
     ```
     
-    Bu komut, `open()` sistem çağrısını izler ve hangi dosyaların açıldığını gösterir.
-    
-- Dinamik analiz yapmak için güçlü bir araçtır.
+
+Yapısı: 
+
+frida-trace -U -j “PackageName.ClassName!MethodName” ApplicationName
+
+### 4. Objection
+
+- F**rida’yı arka planda kullanan** bir mobil güvenlik test aracıdır.
+- Android (ve iOS) uygulamalarını **runtime**’da (çalışırken) incelemeye ve manipüle etmeye yarar
+
+Neler yapılabilir?
+
+Sertifika pinning yapan uygulamalar kolayca kandırabilir.
+
+```powershell
+android sslpinning disable
+```
+
+Uygulama root tespitini geçersiz kılabilir.
+
+```powershell
+android root disable
+```
+
+Class’ları, method’ları listeleyebilir.
+
+```powershell
+android hooking list classes
+```
+
+Activity’ler listeyebilir.
+
+```powershell
+android hooking list activity
+```
